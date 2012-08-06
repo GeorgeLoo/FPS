@@ -55,16 +55,18 @@ def moveright():
 
 @window.event
 def on_mouse_motion(x, y, dx, dy):
+    global   movestop,moveleft,moveright,direct
     #print x, y, dx, dy
     w=window.width
     h=window.height
     if x>w/3*2:
-        #print 'right'
-        moveright()
+        direct=moveright
+        #moveright()
     elif x < w/3:
-        #print 'left'
-        moveleft()
+        direct=moveleft
+        #moveleft()
     else:
+        direct=movestop
         pass #print 'stopped'
     
     pass
@@ -77,9 +79,14 @@ def on_draw():
     ai.blit(0,0,width=window.width,height=window.height)
     
 def callback(dt):
+    global   movestop,moveleft,moveright,direct
+    if direct==moveleft:
+        moveleft()
+    elif direct == moveright:
+        moveright()
     pass
 
-clock.schedule_interval(callback, 1.0)
+clock.schedule_interval(callback, 0.025)
 clock.set_fps_limit(60)
 
 if __name__ == "__main__":
