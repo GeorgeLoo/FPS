@@ -34,16 +34,22 @@ rightside=bg.width/3*2
 
 def moveleft():
     global leftside,rightside,ai
-    leftside-=1
-    rightside-=1
-    ai = bg.get_region(leftside, 0, rightside, bg.height)
+    move=10
+    if leftside-move>0:
+        print 'left'
+        leftside-=move
+        rightside-=move
+        ai = bg.get_region(leftside, 0, rightside, bg.height)
     pass
 
 def moveright():
     global leftside,rightside,ai
-    leftside+=1
-    rightside+=1
-    ai = bg.get_region(leftside, 0, rightside, bg.height)
+    move=10
+    if rightside+move<bg.width-650:
+        leftside+=move
+        rightside+=move
+        print 'right', leftside,rightside,bg.width
+        ai = bg.get_region(leftside, 0, rightside, bg.height)
     pass
 
 
@@ -54,10 +60,10 @@ def on_mouse_motion(x, y, dx, dy):
     h=window.height
     if x>w/3*2:
         #print 'right'
-        moveleft()
+        moveright()
     elif x < w/3:
         #print 'left'
-        moveright()
+        moveleft()
     else:
         pass #print 'stopped'
     
