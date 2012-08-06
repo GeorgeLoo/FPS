@@ -15,14 +15,19 @@ window.maximize()
 data='.\\data\\'
 drawpath='.\\draw\\'
 fname=drawpath+'scene.jpg'
-backgroundspr = pyglet.image.load(fname)
+bg = pyglet.image.load(fname)
 #backgroundspr.set_position(0,0)
-
+#pyglet.image.ImageData
+print bg.width
+print bg.width-(bg.width/3)
+ai = bg.get_region(bg.width/3, 0, bg.width-(bg.width/3*2), bg.height)
 
 @window.event
 def on_draw():
     window.clear()
-    backgroundspr.blit(0,0,width=window.width,height=window.height)
-
+    #backgroundspr.blit(0,0,width=window.width,height=window.height)
+    ai.blit(0,0,width=window.width,height=window.height)
+    
+    
 if __name__ == "__main__":
     pyglet.app.run()   
