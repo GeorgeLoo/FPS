@@ -23,20 +23,20 @@ bg = pyglet.image.load(fname)
 #pyglet.image.ImageData
 print bg.width
 print bg.width-(bg.width/3)
-ai = bg.get_region(bg.width/3, 0, bg.width-(bg.width/3*2), bg.height)
 
 movestop=100
 moveleft=110
 moveright=120
 direct=movestop
 leftside=bg.width/3
-rightside=bg.width/3*2
+rightside=bg.width-bg.width/3*2
+ai = bg.get_region(leftside, 0, rightside, bg.height)
 
 def moveleft():
     global leftside,rightside,ai
-    move=10
-    if leftside-move>0:
-        print 'left'
+    move=50
+    if leftside-move>200:
+        #print 'left'
         leftside-=move
         rightside-=move
         ai = bg.get_region(leftside, 0, rightside, bg.height)
@@ -44,11 +44,11 @@ def moveleft():
 
 def moveright():
     global leftside,rightside,ai
-    move=10
-    if rightside+move<bg.width-650:
+    move=50
+    if rightside+move<bg.width-900:
         leftside+=move
         rightside+=move
-        print 'right', leftside,rightside,bg.width
+        #print 'right', leftside,rightside,bg.width
         ai = bg.get_region(leftside, 0, rightside, bg.height)
     pass
 
