@@ -26,6 +26,8 @@ import random
 
 class RangePractice:
     def __init__(self,w,h):
+        self.width = w
+        self.height = h
         self.data = '.\\draw\\'
         self.hits = 0
         self.targets = 0
@@ -33,15 +35,17 @@ class RangePractice:
         self.target.set_position(100,100)
         self.target.scale = 0.3
         self.weapon = self.SpriteLoad('sar21_2.jpg')
-        self.weapon.set_position(300,1)
+        self.weapon.set_position(self.width/4, 1)
         self.weapon.scale = 0.3
         clock.schedule_interval(self.targetcallback, 1.0)
         clock.schedule_interval(self.autofirecall, 0.05)
-        self.width = w
-        self.height = h
         self.rotc = 0
         self.ResetGame()
 	self.sound = Sounds()
+	self.status = pyglet.text.Label('Hello, world',
+                          font_name='Times New Roman',
+                          font_size=24,
+                          x=self.width//2, y = 20)
 	
         
 	
@@ -49,19 +53,23 @@ class RangePractice:
         pass
         
     def ResetGame(self):
+	self.magazine = 30
         self.shotsfired = 0
         self.shotsOnTarget = 0
         self.timeleft = 60 # seconds
     
-    def SpriteLoad(self, name):
+    def SpriteLoad(self, name, centre=False):
         image = pyglet.image.load(self.data+name)
+	if centre:
+	    image.anchor_x = image.width / 2
+	    image.anchor_y = image.height / 2
         return pyglet.sprite.Sprite(image)
         
     def targetcallback(self, dt):
         x = random.randrange(1,self.width-self.target.width)
         y = random.randrange(1,self.height-self.target.height)
         self.target.set_position(x,y)
-        #print 'callback'
+        #print 'target callback'
     
     def withinrect(self, x,y,r):
         x1,y1=r[0],r[1]
@@ -76,26 +84,40 @@ class RangePractice:
         return cursor
     
     def mouseright(self, x,y):
+	#print 'fire', self.target.x,self.target.y
 	self.sound.Play(self.sound.sar21)
+	self.magazine -= 1
+        self.shotsfired += 1
         l = self.target.x
         t = self.target.y
         r = self.target.x + self.target.width
         b = self.target.y + self.target.height
         rect = [l, t, r, b]
         if self.withinrect(x, y, rect):
+	    self.shotsOnTarget += 1
+	    #print 'hit'
             self.rotc = 5
             self.target.rotation = -90.0
         pass
     
+    def SetStatus(self):
+	s=''
+	s= 'Shots: '+str(self.shotsfired)
+	s=s+' Hits: '+ str(self.shotsOnTarget)
+	self.status.text = s
+	
     def draw(self):
         self.target.draw()
         self.weapon.draw()
         self.rotc -= 1
         if self.rotc == 0:
             self.target.rotation = 0.0
-        pass
+	self.SetStatus()
+	self.status.draw()
+        
     
-    pass
+    
+    
 
 
 class FPSWin(pyglet.window.Window):
@@ -133,7 +155,7 @@ class Sounds:
 		#self.player.queue(self.gunsound)
 		
 	def Load(self,f):
-		print f
+		#print f
 		s = pyglet.media.StaticSource(pyglet.media.load(self.soundpath+f, streaming=False))
 		#print s.duration
 		#s.play()
