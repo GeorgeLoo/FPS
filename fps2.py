@@ -6,7 +6,12 @@
 fps2.py 29.9.2012
 ----------------------
 
-
+Shots fired, 
+on target, 
+sounds, reload, 
+one minute, 
+reset
+auto fire
 
 ---------------------
 
@@ -30,16 +35,29 @@ class RangePractice:
         self.weapon = self.SpriteLoad('sar21_2.jpg')
         self.weapon.set_position(300,1)
         self.weapon.scale = 0.3
-        clock.schedule_interval(self.callback, 1.0)
+        clock.schedule_interval(self.targetcallback, 1.0)
+        clock.schedule_interval(self.autofirecall, 0.05)
         self.width = w
         self.height = h
         self.rotc = 0
+        self.ResetGame()
+	self.sound = Sounds()
+	
+        
+	
+    def autofirecall(self,dt):
+        pass
+        
+    def ResetGame(self):
+        self.shotsfired = 0
+        self.shotsOnTarget = 0
+        self.timeleft = 60 # seconds
     
     def SpriteLoad(self, name):
         image = pyglet.image.load(self.data+name)
         return pyglet.sprite.Sprite(image)
         
-    def callback(self, dt):
+    def targetcallback(self, dt):
         x = random.randrange(1,self.width-self.target.width)
         y = random.randrange(1,self.height-self.target.height)
         self.target.set_position(x,y)
@@ -58,6 +76,7 @@ class RangePractice:
         return cursor
     
     def mouseright(self, x,y):
+	self.sound.Play(self.sound.sar21)
         l = self.target.x
         t = self.target.y
         r = self.target.x + self.target.width
@@ -99,6 +118,41 @@ class FPSWin(pyglet.window.Window):
     def on_draw(self):
         self.clear()
         self.o.draw()
+
+class Sounds:
+	soundpath='.\\sound\\'
+	MuteSound = 0
+	
+	def __init__(self):
+		try:
+			self.sar21 = self.Load('sar21.wav')
+			#self.wallhit = self.Load('wallhit.mp3')
+		except:
+			print 'sound file fucked'
+		# self. = self.Load('')
+		#self.player.queue(self.gunsound)
+		
+	def Load(self,f):
+		print f
+		s = pyglet.media.StaticSource(pyglet.media.load(self.soundpath+f, streaming=False))
+		#print s.duration
+		#s.play()
+		return s
+
+	def Play(self,s):
+		if self.MuteSound != 1:
+			#print 'sound play'
+			s.play()
+
+	def On(self):
+		#print 'sound on'
+		self.MuteSound = 0
+
+	def Off(self):
+		self.MuteSound = 1
+	
+
+
 
 if __name__ == "__main__":
     m = FPSWin() 
