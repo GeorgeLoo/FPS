@@ -6,15 +6,18 @@
 fps2.py 29.9.2012
 ----------------------
 
-Shots fired, 
-on target, 
-sounds, reload, 
-one minute, 
+sounds, 
+reload, 
 reset
 auto fire
+fire selection
+bullet holes
 
 ---------------------
 
+one minute, 
+Shots fired, 
+on target, 
 
 
 '''
@@ -38,6 +41,7 @@ class RangePractice:
         self.weapon.set_position(self.width/4, 1)
         self.weapon.scale = 0.3
         clock.schedule_interval(self.targetcallback, 1.0)
+	clock.schedule_interval(self.timercall, 1.0)
         clock.schedule_interval(self.autofirecall, 0.05)
         self.rotc = 0
         self.ResetGame()
@@ -46,10 +50,19 @@ class RangePractice:
                           font_name='Times New Roman',
                           font_size=24,
                           x=self.width//2, y = 20)
+	self.mousex = 0
+	self.mousey = 0
+	self.trigger = False
 	
         
+    def timercall(self, dt):
+	if self.timeleft > 0: self.timeleft -= 1
 	
     def autofirecall(self,dt):
+	if self.trigger: 
+	    x = self.mousex
+	    y = self.mousey
+	    self.mouseright(x,y)
         pass
         
     def ResetGame(self):
@@ -83,8 +96,18 @@ class RangePractice:
         cursor = pyglet.window.ImageMouseCursor(image, 25, 25)
         return cursor
     
+    def mousepos(self,x,y):
+	#print 'mouse pos'
+	self.mousex = x
+	self.mousey = y
+	#self.mouseright(x,y)
+    
+    def mouseup(self):
+	self.trigger = False
+	
     def mouseright(self, x,y):
 	#print 'fire', self.target.x,self.target.y
+	self.trigger = True
 	self.sound.Play(self.sound.sar21)
 	self.magazine -= 1
         self.shotsfired += 1
@@ -104,10 +127,11 @@ class RangePractice:
 	s=''
 	s= 'Shots: '+str(self.shotsfired)
 	s=s+' Hits: '+ str(self.shotsOnTarget)
+	s=s+' Time: '+ str(self.timeleft)
 	self.status.text = s
 	
     def draw(self):
-        self.target.draw()
+        if self.timeleft > 0: self.target.draw()
         self.weapon.draw()
         self.rotc -= 1
         if self.rotc == 0:
@@ -123,7 +147,7 @@ class RangePractice:
 class FPSWin(pyglet.window.Window):
     def __init__(self):
         super(FPSWin, self).__init__(resizable = True) 
-        self.maximize() 
+        #self.maximize() 
         #self.set_fullscreen(True, screen=None)
         #self.set_exclusive_mouse()
         #self.set_size(800, 500)
@@ -133,10 +157,31 @@ class FPSWin(pyglet.window.Window):
         
     def on_mouse_press(self,x, y, button, modifiers):
         if button==pyglet.window.mouse.LEFT:
-            self.set_fullscreen(False, screen=None)
+	    pass
+            #self.set_fullscreen(False, screen=None)
         if button==pyglet.window.mouse.RIGHT:
             self.o.mouseright(x,y)
-
+	    
+    def on_mouse_release(self,x, y, button, modifiers):	   
+	if button==pyglet.window.mouse.RIGHT:
+	    print 'mouseup'
+	    self.o.mouseup()
+	
+    def on_mouse_motion(self, x, y, dx, dy):
+	#print 'motion'
+	#self.o.mousepos(x,y)
+	pass
+    
+    def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
+	if buttons==pyglet.window.mouse.RIGHT:
+	    #print 'drag'
+	    self.o.mousepos(x,y)
+	    pass   
+    
+    def on_key_press(self, symbol, modifiers):
+	if symbol == key.F12:
+	    self.o.ResetGame()
+	    
     def on_draw(self):
         self.clear()
         self.o.draw()
@@ -147,7 +192,7 @@ class Sounds:
 	
 	def __init__(self):
 		try:
-			self.sar21 = self.Load('sar21.wav')
+		        self.sar21 = self.Load('sar21.wav')
 			#self.wallhit = self.Load('wallhit.mp3')
 		except:
 			print 'sound file fucked'
