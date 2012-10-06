@@ -29,13 +29,14 @@ import random
 
 class RangePractice:
     def __init__(self,w,h):
+	s=self
         self.width = w
         self.height = h
         self.data = '.\\draw\\'
         self.hits = 0
         self.targets = 0
-        self.target = self.SpriteLoad('target.jpg')
-        self.target.set_position(100,100)
+        s.target = self.SpriteLoad('target.jpg')
+        self.target.set_position(0,0)
         self.target.scale = 0.3
         self.weapon = self.SpriteLoad('sar21_2.jpg')
         self.weapon.set_position(self.width/4, 1)
@@ -53,13 +54,24 @@ class RangePractice:
 	self.mousex = 0
 	self.mousey = 0
 	self.trigger = False
+	self.selector = 'safe'
+	s.bhole = self.SpriteLoad('bulleth.png',centre=True)
+	s.bullL = []
 	
-        
+    def FireSelect(self):
+	s=self.selector
+	if s == 'safe':
+	    self.selector = 'Semi'
+	elif s == 'Semi':
+	    self.selector = 'AUTO'
+	elif s == 'AUTO':
+	    self.selector = 'safe'
+	
     def timercall(self, dt):
 	if self.timeleft > 0: self.timeleft -= 1
 	
     def autofirecall(self,dt):
-	if self.trigger: 
+	if self.trigger and self.selector == 'AUTO': 
 	    x = self.mousex
 	    y = self.mousey
 	    self.mouseright(x,y)
@@ -106,7 +118,13 @@ class RangePractice:
 	self.trigger = False
 	
     def mouseright(self, x,y):
+	s=self
 	#print 'fire', self.target.x,self.target.y
+	if self.selector == 'safe': return
+	#s.bullL.append((x,y))
+	s.bhole.x = x
+	s.bhole.y = y
+	
 	self.trigger = True
 	self.sound.Play(self.sound.sar21)
 	self.magazine -= 1
@@ -127,10 +145,13 @@ class RangePractice:
 	s=''
 	s= 'Shots: '+str(self.shotsfired)
 	s=s+' Hits: '+ str(self.shotsOnTarget)
+	s=s+' Mode: '+ str(self.selector)
 	s=s+' Time: '+ str(self.timeleft)
+	
 	self.status.text = s
 	
     def draw(self):
+	s=self
         if self.timeleft > 0: self.target.draw()
         self.weapon.draw()
         self.rotc -= 1
@@ -138,7 +159,10 @@ class RangePractice:
             self.target.rotation = 0.0
 	self.SetStatus()
 	self.status.draw()
-        
+	#for i in s.bullL:
+	    #s.bhole.x = i[0]
+	    #s.bhole.y = i[1]
+	s.bhole.draw()
     
     
     
@@ -147,7 +171,7 @@ class RangePractice:
 class FPSWin(pyglet.window.Window):
     def __init__(self):
         super(FPSWin, self).__init__(resizable = True) 
-        #self.maximize() 
+        self.maximize() 
         #self.set_fullscreen(True, screen=None)
         #self.set_exclusive_mouse()
         #self.set_size(800, 500)
@@ -164,7 +188,7 @@ class FPSWin(pyglet.window.Window):
 	    
     def on_mouse_release(self,x, y, button, modifiers):	   
 	if button==pyglet.window.mouse.RIGHT:
-	    print 'mouseup'
+	    #print 'mouseup'
 	    self.o.mouseup()
 	
     def on_mouse_motion(self, x, y, dx, dy):
@@ -181,6 +205,9 @@ class FPSWin(pyglet.window.Window):
     def on_key_press(self, symbol, modifiers):
 	if symbol == key.F12:
 	    self.o.ResetGame()
+	elif symbol == key.B:
+	    self.o.FireSelect()
+	    
 	    
     def on_draw(self):
         self.clear()
