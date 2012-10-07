@@ -6,15 +6,16 @@
 fps2.py 29.9.2012
 ----------------------
 
+
+---------------------
+
+weapon recoil
 sounds, 
 reload, 
 reset
 auto fire
 fire selection
 bullet holes
-
----------------------
-
 one minute, 
 Shots fired, 
 on target, 
@@ -43,7 +44,7 @@ class RangePractice:
         self.weapon.scale = 0.3
         clock.schedule_interval(self.targetcallback, 1.0)
 	clock.schedule_interval(self.timercall, 1.0)
-        clock.schedule_interval(self.autofirecall, 0.05)
+        clock.schedule_interval(self.autofirecall, 0.1)
         self.rotc = 0
         self.ResetGame()
 	self.sound = Sounds()
@@ -57,6 +58,8 @@ class RangePractice:
 	self.selector = 'safe'
 	s.bhole = self.SpriteLoad('bulleth.png',centre=True)
 	s.bullL = []
+	s.reloadcount = 0
+	s.recoilF = 20
 	
     def FireSelect(self):
 	s=self.selector
@@ -66,6 +69,13 @@ class RangePractice:
 	    self.selector = 'AUTO'
 	elif s == 'AUTO':
 	    self.selector = 'safe'
+
+    def Reload(self):
+	s=self
+	self.sound.Play(self.sound.reLoad)
+	s.savedselector = s.selector
+	s.selector = 'RELOAD'
+	s.reloadcount = 100
 	
     def timercall(self, dt):
 	if self.timeleft > 0: self.timeleft -= 1
@@ -78,7 +88,8 @@ class RangePractice:
         pass
         
     def ResetGame(self):
-	self.magazine = 30
+	self.magazine = 9
+	self.onemag = 30
         self.shotsfired = 0
         self.shotsOnTarget = 0
         self.timeleft = 60 # seconds
@@ -116,18 +127,27 @@ class RangePractice:
     
     def mouseup(self):
 	self.trigger = False
-	
+
+    def recoil(self, x, y):
+	s=self
+	r = s.recoilF
+	x = x + random.randrange(-r, r)
+	y = y + random.randrange(-r, r)
+	return x,y
+
     def mouseright(self, x,y):
 	s=self
 	#print 'fire', self.target.x,self.target.y
-	if self.selector == 'safe': return
-	#s.bullL.append((x,y))
-	s.bhole.x = x
-	s.bhole.y = y
+	if self.selector == 'safe' or self.onemag == 0: 
+	    return
+	x,y = s.recoil(x, y)
+	s.bullL.append((x,y))
+	#s.bhole.x = x
+	#s.bhole.y = y
 	
 	self.trigger = True
 	self.sound.Play(self.sound.sar21)
-	self.magazine -= 1
+	self.onemag -= 1
         self.shotsfired += 1
         l = self.target.x
         t = self.target.y
@@ -159,13 +179,17 @@ class RangePractice:
             self.target.rotation = 0.0
 	self.SetStatus()
 	self.status.draw()
-	#for i in s.bullL:
-	    #s.bhole.x = i[0]
-	    #s.bhole.y = i[1]
-	s.bhole.draw()
-    
-    
-    
+	for i in s.bullL:
+	    s.bhole.x = i[0]
+	    s.bhole.y = i[1]
+	    s.bhole.draw()
+	if len(s.bullL)>10:
+	    s.bullL= []
+	s.reloadcount -= 1
+	if self.reloadcount == 0:
+	    self.magazine -= 1
+	    self.onemag = 30
+	    self.selector = s.savedselector
 
 
 class FPSWin(pyglet.window.Window):
@@ -207,7 +231,8 @@ class FPSWin(pyglet.window.Window):
 	    self.o.ResetGame()
 	elif symbol == key.B:
 	    self.o.FireSelect()
-	    
+	elif symbol == key.Z:
+	    self.o.Reload()
 	    
     def on_draw(self):
         self.clear()
@@ -220,6 +245,7 @@ class Sounds:
 	def __init__(self):
 		try:
 		        self.sar21 = self.Load('sar21.wav')
+			self.reLoad = self.Load('reload.wav')
 			#self.wallhit = self.Load('wallhit.mp3')
 		except:
 			print 'sound file fucked'
