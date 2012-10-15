@@ -47,6 +47,7 @@ class RangePractice:
         clock.schedule_interval(self.autofirecall, 0.1)
         self.rotc = 0
         self.ResetGame()
+	self.timeleft = 0 # seconds
 	self.sound = Sounds()
 	self.status = pyglet.text.Label('Hello, world',
                           font_name='Times New Roman',
@@ -72,10 +73,10 @@ class RangePractice:
 
     def Reload(self):
 	s=self
-	self.sound.Play(self.sound.reLoad)
+	self.sound.Player(self.sound.reLoad)
 	s.savedselector = s.selector
 	s.selector = 'RELOAD'
-	s.reloadcount = 100
+	s.reloadcount = 60
 	
     def timercall(self, dt):
 	if self.timeleft > 0: self.timeleft -= 1
@@ -190,6 +191,7 @@ class RangePractice:
 	    self.magazine -= 1
 	    self.onemag = 30
 	    self.selector = s.savedselector
+	    self.sound.Stop()
 
 
 class FPSWin(pyglet.window.Window):
@@ -239,38 +241,47 @@ class FPSWin(pyglet.window.Window):
         self.o.draw()
 
 class Sounds:
-	soundpath='.\\sound\\'
-	MuteSound = 0
-	
-	def __init__(self):
-		try:
-		        self.sar21 = self.Load('sar21.wav')
-			self.reLoad = self.Load('reload.wav')
-			#self.wallhit = self.Load('wallhit.mp3')
-		except:
-			print 'sound file fucked'
-		# self. = self.Load('')
-		#self.player.queue(self.gunsound)
+    soundpath='.\\sound\\'
+    MuteSound = 0
+    
+    def __init__(self):
+	try:
+	    self.sar21 = self.Load('sar21.wav')
+	    self.reLoad = self.Load('reload.wav')
+		#self.wallhit = self.Load('wallhit.mp3')
+	    self.player = pyglet.media.Player()
+	except:
+	    print 'sound file fucked'
+	# self. = self.Load('')
+	#self.player.queue(self.gunsound)
 		
-	def Load(self,f):
-		#print f
-		s = pyglet.media.StaticSource(pyglet.media.load(self.soundpath+f, streaming=False))
-		#print s.duration
-		#s.play()
-		return s
-
-	def Play(self,s):
-		if self.MuteSound != 1:
-			#print 'sound play'
-			s.play()
-
-	def On(self):
-		#print 'sound on'
-		self.MuteSound = 0
-
-	def Off(self):
-		self.MuteSound = 1
+    def Load(self,f):
+	#print f
+	s = pyglet.media.StaticSource(pyglet.media.load(self.soundpath+f, streaming=False))
+	#print s.duration
+	#s.play()
+	return s
 	
+    def Player(self,s):
+	self.player.queue(s)
+	self.player.play()
+
+    def Play(self,s):
+	if self.MuteSound != 1:
+	    #print 'sound play'
+	    s.play()
+		    
+    def Stop(self):
+	self.player.pause()
+	pass
+    
+    def On(self):
+	#print 'sound on'
+	self.MuteSound = 0
+
+    def Off(self):
+	self.MuteSound = 1
+    
 
 
 
