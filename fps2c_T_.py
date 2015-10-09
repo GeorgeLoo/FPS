@@ -1542,7 +1542,7 @@ class ShootingGallery():
                                   'rifle_range.jpg')
             self.TargetObj.create(10, self.winWidth, self.winHeight,'dummy')
             
-            
+            self.gamestage = 5
 
         elif self.gamestage == 1:
             gBattleRep.init() #reset stats            
@@ -1692,12 +1692,33 @@ class ShootingGallery():
             self.hostages = Hostages()
             self.hostages.create(0,self.winWidth,self.winHeight)
             
-        elif self.gamestage == 6:    
+        elif self.gamestage == 6:
+            #assassination 
+            self.equipment.reset()
+            self.equipment.changekey(1, Const.knifeKbar)
+            self.equipment.changekey(2, Const.pistol1911)
+            self.equipment.changekey(3, Const.GLOCK)   
+            self.equipment.changekey(4, Const.M107sniper)
+            self.equipment.changekey(5, Const.MP5)
+            self.equipment.changekey(6, Const.AK47)
+            i = 10
+            self.TargetObj.create(i, self.winWidth, self.winHeight,'real')   
+            self.attHero.addBadGuys(self.TargetObj.getList())  
+            self.attHero.addBadGuys(self.TargetObj.getList())  
+            self.background = \
+                 pyglet.image.load(Const.backgroundFolder+\
+                                   'mansion.jpg')
+            self.nextstage = 1 #another stage within this stage
+            
+            
+            
+        elif self.gamestage == 7:    
             #dining hall attack
             self.equipment.reset()
             self.equipment.changekey(1, Const.knifeKbar)
             self.equipment.changekey(2, Const.pistol1911)
-            self.equipment.changekey(3, Const.GLOCK)      
+            self.equipment.changekey(3, Const.GLOCK)  
+            
             self.timers.reset()
             self.timers.start()
 
@@ -1715,7 +1736,7 @@ class ShootingGallery():
             
             
             
-        elif self.gamestage == 7:    
+        elif self.gamestage == 8:    
 
             
             self.equipment.reset()
@@ -1732,7 +1753,7 @@ class ShootingGallery():
             self.attHero.addBadGuys(self.TargetObj.getList())  
                         
             pass
-        elif self.gamestage == 8:
+        elif self.gamestage == 9:
             self.hostages = Hostages()
             self.hostages.create(0,self.winWidth,self.winHeight)
             self.gamestage = -1
@@ -1859,8 +1880,13 @@ class ShootingGallery():
             self.timers.stop()
             if self.gamestage == 0:
                 self.init() #set up target boards again
-                
-                
+            elif self.gamestage == 6:
+                if self.nextstage == 1:
+                    i = 1
+                    self.CommandoBaddies.create(i, self.winWidth, self.winHeight)
+                    self.timers.start()
+                    self.nextstage = 2
+                    
     
         #for i in self.boardlist:
             #if self.TargetObj.Hit(x,y,i):
