@@ -1542,7 +1542,7 @@ class ShootingGallery():
                                   'rifle_range.jpg')
             self.TargetObj.create(10, self.winWidth, self.winHeight,'dummy')
             
-            self.gamestage = 5
+            #self.gamestage = 5  #quick jump during testing
 
         elif self.gamestage == 1:
             gBattleRep.init() #reset stats            
@@ -1701,6 +1701,7 @@ class ShootingGallery():
             self.equipment.changekey(4, Const.M107sniper)
             self.equipment.changekey(5, Const.MP5)
             self.equipment.changekey(6, Const.AK47)
+            self.equipment.changekey(7, Const.MP7silent)
             i = 10
             self.TargetObj.create(i, self.winWidth, self.winHeight,'real')   
             self.attHero.addBadGuys(self.TargetObj.getList())  
@@ -1880,11 +1881,17 @@ class ShootingGallery():
             self.timers.stop()
             if self.gamestage == 0:
                 self.init() #set up target boards again
-            elif self.gamestage == 6:
-                if self.nextstage == 1:
-                    i = 1
+            elif self.gamestage == 6:  #assassination stage
+                if self.nextstage == 2:
+                    i = 3 #leaders without weapons
                     self.CommandoBaddies.create(i, self.winWidth, self.winHeight)
                     self.timers.start()
+                    self.nextstage = 3
+                elif self.nextstage == 1:
+                    i = 10
+                    self.TargetObj.create(i, self.winWidth, self.winHeight,'real')   
+                    self.attHero.addBadGuys(self.TargetObj.getList())  
+                    self.attHero.addBadGuys(self.TargetObj.getList())     
                     self.nextstage = 2
                     
     
