@@ -1471,6 +1471,8 @@ class ShootingGallery():
         self.pauseBool = False
         self.timers = ScreenTime(countup=True,inittime=0)
         self.wayp = Waypoints()
+        self.MansionAssassinationMission = 6
+        
     def initAttack(self,hero):
         self.herotarget = hero
         self.herotarget.setscreen(self.winWidth,self.winHeight)
@@ -1692,7 +1694,7 @@ class ShootingGallery():
             self.hostages = Hostages()
             self.hostages.create(0,self.winWidth,self.winHeight)
             
-        elif self.gamestage == 6:
+        elif self.gamestage == self.MansionAssassinationMission:
             #assassination 
             self.equipment.reset()
             self.equipment.changekey(1, Const.knifeKbar)
@@ -1702,10 +1704,8 @@ class ShootingGallery():
             self.equipment.changekey(5, Const.MP5)
             self.equipment.changekey(6, Const.AK47)
             self.equipment.changekey(7, Const.MP7silent)
-            i = 10
+            i = 1 #ONE GUARD to start the mission
             self.TargetObj.create(i, self.winWidth, self.winHeight,'real')   
-            self.attHero.addBadGuys(self.TargetObj.getList())  
-            self.attHero.addBadGuys(self.TargetObj.getList())  
             self.background = \
                  pyglet.image.load(Const.backgroundFolder+\
                                    'mansion.jpg')
@@ -1744,6 +1744,7 @@ class ShootingGallery():
             self.equipment.changekey(1, Const.M4assaultRifle)
             self.equipment.changekey(2, Const.MP5)
             self.equipment.changekey(3, Const.pistol1911)
+            self.equipment.changekey(4, Const.Ultimax100SAW)
             self.hostages = Hostages()
             self.hostages.create(0,self.winWidth,self.winHeight)
             self.background = \
@@ -1881,18 +1882,25 @@ class ShootingGallery():
             self.timers.stop()
             if self.gamestage == 0:
                 self.init() #set up target boards again
-            elif self.gamestage == 6:  #assassination stage
-                if self.nextstage == 2:
+            elif self.gamestage == self.MansionAssassinationMission:  #assassination stage
+                if self.nextstage == 3:
                     i = 3 #leaders without weapons
                     self.CommandoBaddies.create(i, self.winWidth, self.winHeight)
                     self.timers.start()
-                    self.nextstage = 3
+                    self.nextstage += 1
+                elif self.nextstage == 2:
+                    i = 10
+                    self.TargetObj.create(i, self.winWidth, self.winHeight,'real')   
+                    self.attHero.addBadGuys(self.TargetObj.getList())  
+                    self.attHero.addBadGuys(self.TargetObj.getList())     
+                    self.nextstage += 1
                 elif self.nextstage == 1:
                     i = 10
                     self.TargetObj.create(i, self.winWidth, self.winHeight,'real')   
                     self.attHero.addBadGuys(self.TargetObj.getList())  
                     self.attHero.addBadGuys(self.TargetObj.getList())     
-                    self.nextstage = 2
+                    self.nextstage += 1
+                    
                     
     
         #for i in self.boardlist:
