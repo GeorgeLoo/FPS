@@ -1471,6 +1471,7 @@ class ShootingGallery():
         self.pauseBool = False
         self.timers = ScreenTime(countup=True,inittime=0)
         self.wayp = Waypoints()
+        self.NuclearPowerStationDefence = 5
         self.MansionAssassinationMission = 6
         
     def initAttack(self,hero):
@@ -1544,7 +1545,7 @@ class ShootingGallery():
                                   'rifle_range.jpg')
             self.TargetObj.create(10, self.winWidth, self.winHeight,'dummy')
             
-            #self.gamestage = 5  #quick jump during testing
+            #self.gamestage = 4  #quick jump during testing
 
         elif self.gamestage == 1:
             gBattleRep.init() #reset stats            
@@ -1669,7 +1670,7 @@ class ShootingGallery():
             self.hostages = Hostages()
             self.hostages.create(40,self.winWidth,self.winHeight)
             self.hostages.setPanic(True)
-        elif self.gamestage == 5:
+        elif self.gamestage == self.NuclearPowerStationDefence:
             
             self.equipment.reset()
             self.equipment.changekey(1, Const.knifeKbar)
@@ -1693,7 +1694,7 @@ class ShootingGallery():
             self.CBattHero2.addBadGuys(self.CommandoBaddies.getList())  
             self.hostages = Hostages()
             self.hostages.create(0,self.winWidth,self.winHeight)
-            
+            self.nextstage = 1 #another stage within this stage
         elif self.gamestage == self.MansionAssassinationMission:
             #assassination 
             self.equipment.reset()
@@ -1704,6 +1705,7 @@ class ShootingGallery():
             self.equipment.changekey(5, Const.MP5)
             self.equipment.changekey(6, Const.AK47)
             self.equipment.changekey(7, Const.MP7silent)
+            self.equipment.changekey(8, Const.M249SAW)
             i = 1 #ONE GUARD to start the mission
             self.TargetObj.create(i, self.winWidth, self.winHeight,'real')   
             self.background = \
@@ -1883,24 +1885,30 @@ class ShootingGallery():
             if self.gamestage == 0:
                 self.init() #set up target boards again
             elif self.gamestage == self.MansionAssassinationMission:  #assassination stage
-                if self.nextstage == 3:
+                if self.nextstage == 4:
                     i = 3 #leaders without weapons
                     self.CommandoBaddies.create(i, self.winWidth, self.winHeight)
                     self.timers.start()
                     self.nextstage += 1
-                elif self.nextstage == 2:
+                elif self.nextstage < 4:
                     i = 10
                     self.TargetObj.create(i, self.winWidth, self.winHeight,'real')   
                     self.attHero.addBadGuys(self.TargetObj.getList())  
                     self.attHero.addBadGuys(self.TargetObj.getList())     
                     self.nextstage += 1
-                elif self.nextstage == 1:
-                    i = 10
-                    self.TargetObj.create(i, self.winWidth, self.winHeight,'real')   
-                    self.attHero.addBadGuys(self.TargetObj.getList())  
-                    self.attHero.addBadGuys(self.TargetObj.getList())     
+                #elif self.nextstage == 1:
+                    #i = 10
+                    #self.TargetObj.create(i, self.winWidth, self.winHeight,'real')   
+                    #self.attHero.addBadGuys(self.TargetObj.getList())  
+                    #self.attHero.addBadGuys(self.TargetObj.getList())     
+                    #self.nextstage += 1
+            elif self.gamestage == self.NuclearPowerStationDefence:
+                if self.nextstage < 6:
+                    i = 50
+                    self.CommandoBaddies.create(i, self.winWidth, self.winHeight)
+                    self.CBattHero.addBadGuys(self.CommandoBaddies.getList())  
+                    self.CBattHero2.addBadGuys(self.CommandoBaddies.getList())  
                     self.nextstage += 1
-                    
                     
     
         #for i in self.boardlist:
